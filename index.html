@@ -2,104 +2,92 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مختبر العلوم الذكي 🧪</title>
+    <title>مختبر الفصل الذكي 🔬</title>
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #eceff1; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .lab-card { background: white; padding: 30px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; border: 6px solid #fb8c00; width: 420px; }
-        h1 { color: #e65100; margin-bottom: 10px; }
+        body { font-family: 'Cairo', sans-serif; background: #f0f4f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; width: 350px; border: 5px solid #00acc1; }
         
-        .funnel-area { position: relative; height: 180px; width: 110px; margin: 20px auto; border: 4px solid #444; border-top: none; border-radius: 0 0 50px 50px; overflow: hidden; background: #fff; }
-        .oil { position: absolute; top: 0; width: 100%; height: 0%; background: #ffd600; transition: all 0.8s; z-index: 2; border-bottom: 2px solid #fbc02d; }
-        .water { position: absolute; bottom: 0; width: 100%; height: 0%; background: #03a9f4; transition: all 0.8s; }
+        /* جهاز الفصل */
+        .funnel-vessel { width: 100px; height: 180px; margin: 20px auto; border: 4px solid #333; border-top: none; border-radius: 0 0 50px 50px; position: relative; background: #fff; overflow: hidden; }
+        .oil-part { position: absolute; top: 0; width: 100%; height: 0%; background: #ffd600; transition: all 1s; z-index: 2; }
+        .water-part { position: absolute; bottom: 0; width: 100%; height: 0%; background: #03a9f4; transition: all 1s; }
         
-        .beaker { width: 80px; height: 65px; border: 3px solid #444; border-top: none; margin: 20px auto; position: relative; border-radius: 0 0 12px 12px; }
-        .collected { position: absolute; bottom: 0; width: 100%; height: 0%; background: #03a9f4; transition: 0.8s; }
+        .beaker { width: 80px; height: 60px; border: 3px solid #333; border-top: none; margin: 20px auto; position: relative; border-radius: 0 0 10px 10px; }
+        .collected-water { position: absolute; bottom: 0; width: 100%; height: 0%; background: #03a9f4; transition: 1s; }
         
-        .btn-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 15px; }
-        button { padding: 12px 18px; font-size: 16px; cursor: pointer; border-radius: 15px; border: none; color: white; font-weight: bold; transition: 0.2s; }
-        .btn-init { background: #9c27b0; width: 100%; margin-bottom: 10px; }
-        .btn-mix { background: #ff9800; }
-        .btn-sep { background: #4caf50; }
-        .btn-reset { background: #f44336; }
-        
-        button:active { transform: scale(0.95); }
-        #status { margin-top: 15px; font-size: 18px; color: #37474f; font-weight: bold; min-height: 50px; background: #fff3e0; padding: 10px; border-radius: 10px; }
+        button { padding: 12px 15px; font-size: 15px; cursor: pointer; border-radius: 12px; border: none; color: white; font-weight: bold; margin: 5px; transition: 0.2s; }
+        .btn-audio { background: #e91e63; width: 100%; }
+        .btn-action { background: #00acc1; }
+        .btn-reset { background: #ff5252; }
+        #msg { margin-top: 15px; font-weight: bold; color: #333; min-height: 40px; background: #e0f7fa; padding: 10px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div class="lab-card">
-    <h1>🔬 فصل الزيت والماء</h1>
+<div class="container">
+    <h2>🧪 تحدي فصل السوائل</h2>
     
-    <button class="btn-init" onclick="initAudio()">🔊 اضغط هنا لتشغيل الصوت أولاً</button>
+    <button class="btn-audio" onclick="setupAudio()">🔊 اضغط هنا لتشغيل الصوت</button>
 
-    <div class="funnel-area">
-        <div id="oilL" class="oil"></div>
-        <div id="waterL" class="water"></div>
+    <div class="funnel-vessel">
+        <div id="oil" class="oil-part"></div>
+        <div id="water" class="water-part"></div>
     </div>
 
-    <div class="beaker"><div id="targetW" class="collected"></div></div>
+    <div class="beaker"><div id="drain" class="collected-water"></div></div>
 
-    <div class="btn-group">
-        <button class="btn-mix" onclick="mix()">🌪️ اخلط</button>
-        <button class="btn-sep" onclick="separate()">💧 افصل</button>
-        <button class="btn-reset" onclick="resetExp()">🔄 إعادة المحاولة</button>
-    </div>
+    <button class="btn-action" onclick="mix()">🌪️ اخلط</button>
+    <button class="btn-action" onclick="separate()">💧 افصل</button>
+    <button class="btn-reset" onclick="resetExp()">🔄 ابدأ من جديد</button>
 
-    <div id="status">جاهز للتجربة؟ ارفع الصوت وابدأ!</div>
+    <div id="msg">فعل الصوت أولاً ثم ابدأ!</div>
 </div>
 
 <script>
     let audioCtx;
-    // نظام الصوت الداخلي المضمون
-    function initAudio() {
+    function setupAudio() {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        playTone(440, 0.2); 
-        document.getElementById('status').innerText = "تم تفعيل الصوت! ✅ اضغط 'اخلط' الآن.";
+        beep(440, 0.2);
+        document.getElementById('msg').innerText = "تم تفعيل الصوت! اخلط السوائل الآن.";
     }
 
-    function playTone(freq, duration) {
+    function beep(freq, duration) {
         if (!audioCtx) return;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.value = freq;
-        osc.start();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = freq; osc.start();
         gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
         osc.stop(audioCtx.currentTime + duration);
     }
 
     function mix() {
-        if (!audioCtx) { alert("فعل الصوت من الزر البنفسجي أولاً!"); return; }
-        playTone(150, 0.4); 
-        document.getElementById('oilL').style.height = "45%";
-        document.getElementById('waterL').style.height = "45%";
-        document.getElementById('oilL').style.top = "0";
-        document.getElementById('status').innerText = "انظر! الزيت طفا فوق الماء لأن كثافته أقل 🌟";
+        if (!audioCtx) { alert("فعل الصوت أولاً"); return; }
+        beep(200, 0.3);
+        document.getElementById('oil').style.height = "45%";
+        document.getElementById('water').style.height = "45%";
+        document.getElementById('oil').style.top = "0";
+        document.getElementById('msg').innerText = "الزيت طفا فوق الماء! هل تعرف لماذا؟";
     }
 
     function separate() {
-        if (document.getElementById('waterL').style.height === "0%") return;
-        playTone(600, 0.2);
-        setTimeout(() => playTone(900, 0.4), 150);
+        if (document.getElementById('water').style.height === "0%") return;
+        beep(600, 0.2); setTimeout(() => beep(800, 0.4), 200);
         
-        document.getElementById('waterL').style.height = "0%";
-        document.getElementById('targetW').style.height = "100%";
-        document.getElementById('oilL').style.top = "45%";
-        document.getElementById('status').innerText = "رائع! نزل الماء وبقي الزيت في الأعلى 🎉";
+        document.getElementById('water').style.height = "0%";
+        document.getElementById('drain').style.height = "100%";
+        document.getElementById('oil').style.top = "50%"; // الزيت ينزل للفوهة ويتوقف!
+        document.getElementById('msg').innerText = "رائع! أغلقنا الصنبور في الوقت المناسب قبل نزول الزيت.";
     }
 
-    // وظيفة إعادة المحاولة من جديد
     function resetExp() {
-        if (audioCtx) playTone(300, 0.1);
-        document.getElementById('oilL').style.height = "0%";
-        document.getElementById('waterL').style.height = "0%";
-        document.getElementById('targetW').style.height = "0%";
-        document.getElementById('oilL').style.top = "0";
-        document.getElementById('status').innerText = "تمت إعادة المختبر! جرب مرة أخرى 🔄";
+        if (audioCtx) beep(300, 0.1);
+        document.getElementById('oil').style.height = "0%";
+        document.getElementById('water').style.height = "0%";
+        document.getElementById('drain').style.height = "0%";
+        document.getElementById('oil').style.top = "0";
+        document.getElementById('msg').innerText = "تمت الإعادة! هل تريد التجربة مرة أخرى؟";
     }
 </script>
-
 </body>
 </html>
