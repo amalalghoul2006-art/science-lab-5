@@ -2,113 +2,102 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مختبر السوائل العجيب 🧪</title>
+    <title>مختبر العلوم الذكي 🧪</title>
     <style>
-        body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #fff9c4 0%, #ffeb3b 100%); min-height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; }
-        .lab-card { background: white; padding: 30px; border-radius: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); text-align: center; border: 8px solid #4db6ac; width: 450px; }
-        h1 { color: #00796b; font-size: 26px; margin-bottom: 5px; }
+        body { font-family: 'Cairo', sans-serif; background: #eceff1; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .lab-card { background: white; padding: 30px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; border: 6px solid #fb8c00; width: 420px; }
+        h1 { color: #e65100; margin-bottom: 10px; }
         
-        /* تصميم قمع الفصل */
-        .funnel-container { height: 220px; position: relative; margin: 20px auto; width: 120px; transition: 0.5s; }
-        .funnel { width: 100%; height: 100%; border: 5px solid #333; border-top: none; border-radius: 10px 10px 60px 60px; position: relative; background: rgba(255,255,255,0.5); overflow: hidden; }
+        .funnel-area { position: relative; height: 180px; width: 110px; margin: 20px auto; border: 4px solid #444; border-top: none; border-radius: 0 0 50px 50px; overflow: hidden; background: #fff; }
+        .oil { position: absolute; top: 0; width: 100%; height: 0%; background: #ffd600; transition: all 0.8s; z-index: 2; border-bottom: 2px solid #fbc02d; }
+        .water { position: absolute; bottom: 0; width: 100%; height: 0%; background: #03a9f4; transition: all 0.8s; }
         
-        .oil-liquid { position: absolute; top: 0; width: 100%; height: 0%; background: #ffd600; transition: all 1.5s; z-index: 2; border-bottom: 2px dashed #fbc02d; }
-        .water-liquid { position: absolute; bottom: 0; width: 100%; height: 0%; background: #03a9f4; transition: all 1.5s; }
+        .beaker { width: 80px; height: 65px; border: 3px solid #444; border-top: none; margin: 20px auto; position: relative; border-radius: 0 0 12px 12px; }
+        .collected { position: absolute; bottom: 0; width: 100%; height: 0%; background: #03a9f4; transition: 0.8s; }
         
-        .tap-part { width: 15px; height: 30px; background: #333; margin: -5px auto 0; position: relative; border-radius: 0 0 5px 5px; }
-        .beaker-target { width: 80px; height: 80px; border: 4px solid #555; border-top: none; border-radius: 0 0 15px 15px; margin: 40px auto 0; position: relative; background: #fff; }
-        .collected-water { position: absolute; bottom: 0; width: 100%; height: 0%; background: #03a9f4; transition: 1.5s; }
-
-        .controls { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        .btn-row { display: flex; justify-content: center; gap: 10px; }
+        .btn-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 15px; }
+        button { padding: 12px 18px; font-size: 16px; cursor: pointer; border-radius: 15px; border: none; color: white; font-weight: bold; transition: 0.2s; }
+        .btn-init { background: #9c27b0; width: 100%; margin-bottom: 10px; }
+        .btn-mix { background: #ff9800; }
+        .btn-sep { background: #4caf50; }
+        .btn-reset { background: #f44336; }
         
-        button { padding: 15px 20px; font-size: 18px; border: none; border-radius: 20px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 5px #ccc; transition: 0.2s; }
-        .btn-mix { background: #ff5722; }
-        .btn-sep { background: #009688; }
-        .btn-audio { background: #9c27b0; font-size: 14px; padding: 10px; }
-        button:active { transform: translateY(4px); box-shadow: 0 2px #666; }
-        
-        #msg { background: #e0f2f1; padding: 15px; border-radius: 20px; margin-top: 20px; font-size: 18px; color: #004d40; border: 2px solid #4db6ac; min-height: 50px; }
-
-        @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(5deg); } 50% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } 100% { transform: rotate(0deg); } }
-        .shaking { animation: shake 0.5s infinite; }
+        button:active { transform: scale(0.95); }
+        #status { margin-top: 15px; font-size: 18px; color: #37474f; font-weight: bold; min-height: 50px; background: #fff3e0; padding: 10px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div class="lab-card">
-    <h1>🎨 مختبر فصل السوائل</h1>
-    <p>لنفصل الزيت الأصفر عن الماء الأزرق!</p>
+    <h1>🔬 فصل الزيت والماء</h1>
+    
+    <button class="btn-init" onclick="initAudio()">🔊 اضغط هنا لتشغيل الصوت أولاً</button>
 
-    <button class="btn-audio" onclick="enableAudio()">🔈 اضغط هنا لتفعيل الصوت أولاً</button>
-
-    <div class="funnel-container" id="funnelBox">
-        <div class="funnel">
-            <div id="oil" class="oil-liquid"></div>
-            <div id="water" class="water-liquid"></div>
-        </div>
-        <div class="tap-part"></div>
+    <div class="funnel-area">
+        <div id="oilL" class="oil"></div>
+        <div id="waterL" class="water"></div>
     </div>
 
-    <div class="beaker-target">
-        <div id="collected" class="collected-water"></div>
+    <div class="beaker"><div id="targetW" class="collected"></div></div>
+
+    <div class="btn-group">
+        <button class="btn-mix" onclick="mix()">🌪️ اخلط</button>
+        <button class="btn-sep" onclick="separate()">💧 افصل</button>
+        <button class="btn-reset" onclick="resetExp()">🔄 إعادة المحاولة</button>
     </div>
 
-    <div class="controls">
-        <div class="btn-row">
-            <button class="btn-mix" onclick="startMix()">🌪️ خلط السوائل</button>
-            <button class="btn-sep" onclick="startSep()">💧 فتح الصنبور</button>
-        </div>
-    </div>
-
-    <div id="msg">مرحباً يا بطل! فعل الصوت ثم اضغط خلط لنبدأ.</div>
+    <div id="status">جاهز للتجربة؟ ارفع الصوت وابدأ!</div>
 </div>
 
-<audio id="soundMix" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
-<audio id="soundWin" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
-
 <script>
-    // وظيفة لتفعيل الصوت وتخطي حماية المتصفح
-    function enableAudio() {
-        document.getElementById('soundMix').play().then(() => {
-            document.getElementById('soundMix').pause();
-            document.getElementById('msg').innerText = "تم تفعيل الصوت! ابدأ التجربة الآن.";
-        }).catch(error => console.log("Audio interaction needed"));
+    let audioCtx;
+    // نظام الصوت الداخلي المضمون
+    function initAudio() {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        playTone(440, 0.2); 
+        document.getElementById('status').innerText = "تم تفعيل الصوت! ✅ اضغط 'اخلط' الآن.";
     }
 
-    function startMix() {
-        const mixAudio = document.getElementById('soundMix');
-        mixAudio.currentTime = 0;
-        mixAudio.play();
-        
-        const box = document.getElementById('funnelBox');
-        box.classList.add('shaking');
-        
-        document.getElementById('msg').innerText = "جاري الخلط.. الزيت والماء لا يمتزجان!";
-        
-        setTimeout(() => {
-            box.classList.remove('shaking');
-            document.getElementById('oil').style.height = "45%";
-            document.getElementById('water').style.height = "45%";
-            document.getElementById('msg').innerHTML = "انظر! 😲 الزيت يطفو لأنه <b>أخف</b> من الماء.";
-        }, 1500);
+    function playTone(freq, duration) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.stop(audioCtx.currentTime + duration);
     }
 
-    function startSep() {
-        if(document.getElementById('water').style.height === "0%") {
-            alert("اخلط السوائل أولاً!");
-            return;
-        }
+    function mix() {
+        if (!audioCtx) { alert("فعل الصوت من الزر البنفسجي أولاً!"); return; }
+        playTone(150, 0.4); 
+        document.getElementById('oilL').style.height = "45%";
+        document.getElementById('waterL').style.height = "45%";
+        document.getElementById('oilL').style.top = "0";
+        document.getElementById('status').innerText = "انظر! الزيت طفا فوق الماء لأن كثافته أقل 🌟";
+    }
 
-        document.getElementById('water').style.height = "0%";
-        document.getElementById('collected').style.height = "100%";
-        document.getElementById('oil').style.top = "50%";
+    function separate() {
+        if (document.getElementById('waterL').style.height === "0%") return;
+        playTone(600, 0.2);
+        setTimeout(() => playTone(900, 0.4), 150);
         
-        document.getElementById('msg').innerHTML = "تم الفصل بنجاح! الماء بالأسفل والزيت بالأعلى 🎉";
-        
-        const winAudio = document.getElementById('soundWin');
-        winAudio.currentTime = 0;
-        winAudio.play();
+        document.getElementById('waterL').style.height = "0%";
+        document.getElementById('targetW').style.height = "100%";
+        document.getElementById('oilL').style.top = "45%";
+        document.getElementById('status').innerText = "رائع! نزل الماء وبقي الزيت في الأعلى 🎉";
+    }
+
+    // وظيفة إعادة المحاولة من جديد
+    function resetExp() {
+        if (audioCtx) playTone(300, 0.1);
+        document.getElementById('oilL').style.height = "0%";
+        document.getElementById('waterL').style.height = "0%";
+        document.getElementById('targetW').style.height = "0%";
+        document.getElementById('oilL').style.top = "0";
+        document.getElementById('status').innerText = "تمت إعادة المختبر! جرب مرة أخرى 🔄";
     }
 </script>
 
