@@ -8,6 +8,7 @@
         .lab-card { background: white; padding: 30px; border-radius: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); text-align: center; border: 8px solid #4db6ac; width: 450px; }
         h1 { color: #00796b; font-size: 26px; margin-bottom: 5px; }
         
+        /* تصميم قمع الفصل */
         .funnel-container { height: 220px; position: relative; margin: 20px auto; width: 120px; transition: 0.5s; }
         .funnel { width: 100%; height: 100%; border: 5px solid #333; border-top: none; border-radius: 10px 10px 60px 60px; position: relative; background: rgba(255,255,255,0.5); overflow: hidden; }
         
@@ -18,15 +19,17 @@
         .beaker-target { width: 80px; height: 80px; border: 4px solid #555; border-top: none; border-radius: 0 0 15px 15px; margin: 40px auto 0; position: relative; background: #fff; }
         .collected-water { position: absolute; bottom: 0; width: 100%; height: 0%; background: #03a9f4; transition: 1.5s; }
 
-        .controls { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        .controls { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .btn-row { display: flex; justify-content: center; gap: 10px; }
+        
         button { padding: 15px 20px; font-size: 18px; border: none; border-radius: 20px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 5px #ccc; transition: 0.2s; }
         .btn-mix { background: #ff5722; }
         .btn-sep { background: #009688; }
+        .btn-audio { background: #9c27b0; font-size: 14px; padding: 10px; }
         button:active { transform: translateY(4px); box-shadow: 0 2px #666; }
         
-        #msg { background: #e0f2f1; padding: 15px; border-radius: 20px; margin-top: 20px; font-size: 18px; color: #004d40; border: 2px solid #4db6ac; }
+        #msg { background: #e0f2f1; padding: 15px; border-radius: 20px; margin-top: 20px; font-size: 18px; color: #004d40; border: 2px solid #4db6ac; min-height: 50px; }
 
-        /* حركة الاهتزاز */
         @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(5deg); } 50% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } 100% { transform: rotate(0deg); } }
         .shaking { animation: shake 0.5s infinite; }
     </style>
@@ -36,6 +39,8 @@
 <div class="lab-card">
     <h1>🎨 مختبر فصل السوائل</h1>
     <p>لنفصل الزيت الأصفر عن الماء الأزرق!</p>
+
+    <button class="btn-audio" onclick="enableAudio()">🔈 اضغط هنا لتفعيل الصوت أولاً</button>
 
     <div class="funnel-container" id="funnelBox">
         <div class="funnel">
@@ -50,49 +55,62 @@
     </div>
 
     <div class="controls">
-        <button class="btn-mix" onclick="startMix()">🌪️ خلط السوائل</button>
-        <button class="btn-sep" onclick="startSep()">💧 فتح الصنبور</button>
+        <div class="btn-row">
+            <button class="btn-mix" onclick="startMix()">🌪️ خلط السوائل</button>
+            <button class="btn-sep" onclick="startSep()">💧 فتح الصنبور</button>
+        </div>
     </div>
 
-    <div id="msg">مرحباً يا بطل! اضغط خلط لنبدأ.</div>
+    <div id="msg">مرحباً يا بطل! فعل الصوت ثم اضغط خلط لنبدأ.</div>
 </div>
 
-<audio id="soundMix" src="https://www.soundjay.com/buttons/beep-01a.mp3"></audio>
-<audio id="soundWin" src="https://www.soundjay.com/human/applause-01.mp3"></audio>
+<audio id="soundMix" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
+<audio id="soundWin" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
 
 <script>
+    // وظيفة لتفعيل الصوت وتخطي حماية المتصفح
+    function enableAudio() {
+        document.getElementById('soundMix').play().then(() => {
+            document.getElementById('soundMix').pause();
+            document.getElementById('msg').innerText = "تم تفعيل الصوت! ابدأ التجربة الآن.";
+        }).catch(error => console.log("Audio interaction needed"));
+    }
+
     function startMix() {
-        // تشغيل صوت بسيط
-        document.getElementById('soundMix').play();
+        const mixAudio = document.getElementById('soundMix');
+        mixAudio.currentTime = 0;
+        mixAudio.play();
         
-        // اهتزاز القمع
         const box = document.getElementById('funnelBox');
         box.classList.add('shaking');
         
-        document.getElementById('msg').innerText = "جاري الخلط.. انتظر قليلاً!";
+        document.getElementById('msg').innerText = "جاري الخلط.. الزيت والماء لا يمتزجان!";
         
         setTimeout(() => {
             box.classList.remove('shaking');
             document.getElementById('oil').style.height = "45%";
             document.getElementById('water').style.height = "45%";
-            document.getElementById('msg').innerHTML = "انظر! 😲 الزيت يرتفع للأعلى لأنه أخف من الماء.";
+            document.getElementById('msg').innerHTML = "انظر! 😲 الزيت يطفو لأنه <b>أخف</b> من الماء.";
         }, 1500);
     }
 
     function startSep() {
-        if(document.getElementById('water').style.height === "0%") return;
+        if(document.getElementById('water').style.height === "0%") {
+            alert("اخلط السوائل أولاً!");
+            return;
+        }
 
         document.getElementById('water').style.height = "0%";
         document.getElementById('collected').style.height = "100%";
         document.getElementById('oil').style.top = "50%";
         
-        document.getElementById('msg').innerHTML = "رائع جداً! تم فصل الماء بنجاح 🎉";
+        document.getElementById('msg').innerHTML = "تم الفصل بنجاح! الماء بالأسفل والزيت بالأعلى 🎉";
         
-        // صوت تصفيق للنجاح
-        document.getElementById('soundWin').play();
+        const winAudio = document.getElementById('soundWin');
+        winAudio.currentTime = 0;
+        winAudio.play();
     }
 </script>
 
 </body>
 </html>
-         
